@@ -1,0 +1,42 @@
+﻿{
+	"is-c3-addon": true,
+	"type": "plugin",
+	"name": "Map.ly V2",
+	"id": "LysdenArt_MaplyLitePlugin",
+	"version": "1.0.2",
+	"author": "Lysden.art",
+	"website": "https://lysden.art",
+	"documentation": "https://lysden.gumroad.com/l/eggqe",
+	"description": "A plugin that integrates leaflet.js to display maps in Construct 3.",
+	"editor-scripts": [
+		"plugin.js",
+		"type.js",
+		"instance.js"
+	],
+	"file-list": [
+		"c3runtime/plugin.js",
+		"c3runtime/type.js",
+		"c3runtime/instance.js",
+		"c3runtime/domSide.js",
+		"c3runtime/conditions.js",
+		"c3runtime/actions.js",
+		"c3runtime/expressions.js",
+		"lang/en-US.json",
+		"external/leaflet.css",
+		"external/leaflet.js",
+		"external/Leaflet.TileLayerCanvas.js",
+		"external/images/layers.png",
+		"external/images/layers-2x.png",
+		"external/images/marker-icon.png",
+		"external/images/spritesheet-2x.png",
+		"external/images/spritesheet.png",
+		"external/images/spritesheet.svg",
+		"external/images/loader.gif",
+		"aces.json",
+		"addon.json",
+		"icon.svg",
+		"plugin.js",
+		"type.js",
+		"instance.js"
+	]
+}

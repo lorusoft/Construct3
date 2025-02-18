@@ -1,0 +1,116 @@
+{
+	"mapstate": {
+		"actions": [
+		],
+		"conditions": [
+			{ "id": "on-resize", "scriptName": "OnResize", "highlight": false, "isTrigger": true, "isInvertible": false },
+			{ "id": "on-load", "scriptName": "OnLoad", "highlight": false, "isTrigger": true, "isInvertible": false },
+			{ "id": "on-zoom-start", "scriptName": "OnZoomStart", "highlight": false, "isTrigger": true, "isInvertible": false },
+			{ "id": "on-zoom", "scriptName": "OnZoom", "highlight": false, "isTrigger": true, "isInvertible": false },
+			{ "id": "on-zoom-end", "scriptName": "OnZoomEnd", "highlight": false, "isTrigger": true, "isInvertible": false },
+			{ "id": "on-marker-click", "scriptName": "OnMarkerClick", "highlight": false, "isTrigger": true, "isInvertible": false }
+		],
+		"expressions": [
+			{ "id": "get-zoom", "expressionName": "GetZoom", "scriptName": "GetZoom", "highlight": false, "returnType": "number" },
+			{ "id": "get-min-zoom", "expressionName": "GetMinZoom", "scriptName": "GetMinZoom", "highlight": false, "returnType": "number" },
+			{ "id": "get-max-zoom", "expressionName": "GetMaxZoom", "scriptName": "GetMaxZoom", "highlight": false, "returnType": "number" },
+			{ "id": "get-marker-count", "expressionName": "GetMarkerCount", "scriptName": "GetMarkerCount", "highlight": false, "returnType": "number" }
+		]
+	},
+	"interactionevents": {
+		"actions": [
+		],
+		"conditions": [
+			{ "id": "on-click", "scriptName": "OnClick", "highlight": false, "isTrigger": true, "isInvertible": false }
+		]
+	},
+	"mapControls": {
+		"actions": [
+			{
+				"id": "set-view",
+				"scriptName": "SetView",
+				"highlight": false,
+				"params": [
+					{ "id": "lat", "type": "number" },
+					{ "id": "lng", "type": "number" }
+				]
+			},
+			{
+				"id": "set-zoom",
+				"scriptName": "SetZoom",
+				"highlight": false,
+				"params": [
+					{ "id": "zoom", "type": "number" }
+				]
+			},
+			{
+				"id": "add-marker",
+				"scriptName": "AddMarker",
+				"highlight": false,
+				"params": [
+					{ "id": "lat", "type": "number" },
+					{ "id": "lng", "type": "number" },
+					{ "id": "iconUrl", "type": "string" },
+					{ "id": "title", "type": "string" },
+					{ "id": "popupContent", "type": "string" }
+				]
+			}
+		]
+	},
+	"mapOptions": {
+		"actions": [
+			{
+				"id": "set-zoom-control-visible",
+				"scriptName": "SetZoomControlVisible",
+				"highlight": false,
+				"params": [
+					{ "id": "set-visible", "type": "combo", "initialValue": "visible", "items": ["invisible", "visible"] }
+				]
+			},
+			{
+				"id": "set-control-scale-visible",
+				"scriptName": "SetControlScaleVisible",
+				"highlight": false,
+				"params": [
+					{ "id": "set-visible", "type": "combo", "initialValue": "visible", "items": ["invisible", "visible"] }
+				]
+			}
+		]
+	},
+	"mapObject": {
+		"actions": []
+	},
+	"mapAppearance": {
+		"actions": [
+			{
+				"id": "set-flip",
+				"scriptName": "SetFlip",
+				"highlight": false,
+				"params": [
+					{ "id": "flip", "type": "boolean" }
+				]
+			},
+			{
+				"id": "set-mirror",
+				"scriptName": "SetMirror",
+				"highlight": false,
+				"params": [
+					{ "id": "mirror", "type": "boolean" }
+				]
+			},
+			{
+				"id": "change-base-tile-layer",
+				"scriptName": "ChangeBaseTileLayer",
+				"highlight": false,
+				"params": [
+					{ "id": "url", "type": "string" },
+					{ "id": "attribution", "type": "string" }
+				]
+			}
+		],
+		"conditions": [
+			{ "id": "is-flipped", "scriptName": "IsFlipped", "highlight": false, "isTrigger": false, "isInvertible": true },
+			{ "id": "is-mirrored", "scriptName": "IsMirrored", "highlight": false, "isTrigger": false, "isInvertible": true }
+		]
+	}
+}
