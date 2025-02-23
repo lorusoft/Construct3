@@ -7,21 +7,48 @@
     constructor(iRuntime) {
       super(iRuntime, DOM_COMPONENT_ID);
 
-      // Handlers já existentes para outras funções
       this.AddDOMElementMessageHandler("refresh_lite", (elem, e) =>
         this.refresh(elem, e)
       );
       this.AddDOMElementMessageHandler("SetZoomControlVisible_lite", (elem, e) =>
         this.setZoomControlVisible(elem, e)
       );
-      this.AddDOMElementMessageHandler("AddMarker_lite", (elem, e) =>
-        this.addMarker(elem, e)
+      this.AddDOMElementMessageHandler("SetControlScaleVisible_lite", (elem, e) =>
+        this.setControlScaleVisible(elem, e)
       );
-      this.AddDOMElementMessageHandler("RemoveMarker_lite", (elem, e) =>
-        this.removeMarker(elem, e)
+      this.AddDOMElementMessageHandler("ChangeBaseLayer_lite", (elem, e) =>
+        this.changeBaseLayer(elem, e)
       );
-
-      // Outros handlers existentes
+      this.AddDOMElementMessageHandler("RequireUpdatedState_lite", (elem, e) =>
+        this.sendUpdatedStateToRuntime(elem, e)
+      );
+      this.AddDOMElementMessageHandler("GetDistance_lite", (elem, e) =>
+        this.getDistance(elem, e)
+      );
+      this.AddDOMElementMessageHandler("FlyTo_lite", (elem, e) =>
+        this.flyTo(elem, e)
+      );
+      this.AddDOMElementMessageHandler("StopMvt_lite", (elem, e) =>
+        this.stopMvt(elem, e)
+      );
+      this.AddDOMElementMessageHandler("SetSize_lite", (elem, e) =>
+        this.setSize(elem, e)
+      );
+      this.AddDOMElementMessageHandler("SetPosition_lite", (elem, e) =>
+        this.setPosition(elem, e)
+      );
+      this.AddDOMElementMessageHandler("SetOpacity_lite", (elem, e) =>
+        this.setOpacity(elem, e)
+      );
+      this.AddDOMElementMessageHandler("SetTransform_lite", (elem, e) =>
+        this.setTransform(elem, e)
+      );
+      this.AddDOMElementMessageHandler("SetZoom_lite", (elem, e) =>
+        this.setZoom(elem, e)
+      );
+      this.AddDOMElementMessageHandler("SetView_lite", (elem, e) =>
+        this.setView(elem, e)
+      );
       this.AddDOMElementMessageHandler("ShowMap_lite", (elem, e) => {
         this.showMap(elem, e);
         this.refresh(elem, e);
@@ -36,6 +63,27 @@
       this.placeMapFrame(leafLet, e);
       this.showMap(leafLet, e);
 
+      // START --- Corrected links for preview mode ---
+      var previewUrl = "";
+      if (e.params.spritesheetPng) {
+        previewUrl += ".leaflet-draw-toolbar a{background-image:url(";
+        previewUrl += e.params.spritesheetPng;
+        previewUrl +=
+          "); background-image: linear-gradient(transparent,transparent),url(";
+        previewUrl += e.params.spritesheetSvg;
+        previewUrl += ");}";
+      }
+      if (e.params.layersPng) {
+        previewUrl += ".leaflet-control-layers-toggle{background-image:url(";
+        previewUrl += e.params.layersPng;
+        previewUrl += ");}";
+      }
+      // END --- Corrected links for preview mode ---
+
+      var newStyle = document.createElement("style");
+      newStyle.appendChild(document.createTextNode(previewUrl));
+      document.head.appendChild(newStyle);
+
       globalThis.L.Map.addInitHook(function () {
         this.getContainer().objMap = this;
       });
@@ -44,6 +92,7 @@
       document.body.children[1].style.position = "absolute";
 
       this.createMap(leafLet, e);
+
       this.addListeners(leafLet, elementId);
       this.createLayers(leafLet, e);
       this.setZoomPermission(leafLet, e);
@@ -56,42 +105,6 @@
       this.refresh(leafLet, e);
 
       return leafLet;
-    }
-
-    // Função para adicionar um marcador ao mapa
-    addMarker(elem, e) {
-      const { lat, lng, title, iconUrl } = e;
-
-      // Definir as opções de ícone (caso fornecido)
-      const markerOptions = {
-        title: title || "Marcador",
-        icon: iconUrl ? globalThis.L.icon({ iconUrl: iconUrl }) : null,
-      };
-
-      // Criar o marcador no mapa
-      const marker = globalThis.L.marker([lat, lng], markerOptions).addTo(elem.map);
-
-      // Armazenar os marcadores no elemento para manipulação posterior
-      elem.data.markers = elem.data.markers || [];
-      elem.data.markers.push(marker);
-
-      this.refresh(elem, e);
-    }
-
-    // Função para remover um marcador específico do mapa
-    removeMarker(elem, e) {
-      const markerId = e.markerId;
-
-      // Encontrar o marcador pela id (leaflet_id)
-      const marker = elem.data.markers.find(m => m._leaflet_id === markerId);
-      
-      // Remover o marcador se encontrado
-      if (marker) {
-        elem.map.removeLayer(marker);
-        elem.data.markers = elem.data.markers.filter(m => m._leaflet_id !== markerId);
-      }
-
-      this.refresh(elem, e);
     }
 
     UpdateState(elem, e) {
@@ -112,6 +125,7 @@
       this.PostToRuntimeElement("UpdatedState_lite", e.elementId, data);
     }
 
+    // to make the div disappear when the map is cleared
     onDestroy() {
       if (globalThis.document.getElementById(this.mapId)) {
         const mapToBeDeleted = globalThis.document.getElementById(this.mapId);
@@ -146,11 +160,13 @@
     }
 
     addListeners(elem, elementId) {
+      // INTERACTION EVENTS
       var that = this;
       elem.addEventListener("click", function (e) {
         that.PostToRuntimeElement("OnClick_lite", elementId, {});
       });
 
+      // MAP STATE CHANGE EVENTS
       elem.map.on("resize", () =>
         this.PostToRuntimeElement("OnResize_lite", elementId)
       );

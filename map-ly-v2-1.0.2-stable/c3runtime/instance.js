@@ -4,7 +4,9 @@
   const DB_STORE_NAME = "MapLy";
   const DOM_COMPONENT_ID = "lysdenart_maply_lite_plugin";
 
-  C3.Plugins.LysdenArt_MaplyLitePlugin.Instance = class MaplyLiteInstance extends C3.SDKDOMInstanceBase {
+  C3.Plugins.LysdenArt_MaplyLitePlugin.Instance = class MaplyLiteInstance extends (
+    C3.SDKDOMInstanceBase
+  ) {
     constructor(inst, properties) {
       super(inst, DOM_COMPONENT_ID);
 
@@ -24,8 +26,7 @@
           showScaleControl: properties[9],
           doubleClickZoom: properties[10],
           dragging: properties[11],
-          enablingZoom: properties[12],
-          markers: [] // Inicializa a lista de marcadores
+          enablingZoom: properties[12]
         };
       }
 
@@ -39,7 +40,6 @@
         rotation: C3.toDegrees(this.GetWorldInfo().GetAngle()),
         flipped: false,
         mirrored: false,
-        markers: [] // Inicializa o estado dos marcadores
       };
 
       if (this._runtime.IsPreview()) {
@@ -49,29 +49,27 @@
       }
     }
 
-    // Função para adicionar um marcador
-    _AddMarker(latitude, longitude, iconUrl, title, description) {
-      const marker = { latitude, longitude, iconUrl, title, description };
-      this.data.markers.push(marker);
-      this.PostToDOMElement("UpdateMarkers_lite", { markers: this.data.markers });
+    Release() {
+      super.Release();
     }
 
-    // Função para remover um marcador
-    _DeleteMarker(marker) {
-      const index = this.data.markers.indexOf(marker);
-      if (index > -1) {
-        this.data.markers.splice(index, 1);
-        this.PostToDOMElement("UpdateMarkers_lite", { markers: this.data.markers });
-      }
+    GetElementState() {
+      return {
+        params: this.params,
+        data: this.data,
+      };
     }
 
-    // Função para limpar todos os marcadores
-    _ClearAllMarkers() {
-      this.data.markers = [];
-      this.PostToDOMElement("UpdateMarkers_lite", { markers: this.data.markers });
+    _UpdateStateFromDOM(e) {
+      this.data = {
+        ...this.data,
+        lat: e.lat,
+        lng: e.lng,
+        zoom: e.zoom
+      };
     }
 
-    // Funções existentes de eventos do mapa (tamanho, zoom, etc.)
+    // MAP STATE CHANGE EVENTS
     _OnResize(e) {
       this.Trigger(C3.Plugins.LysdenArt_MaplyLitePlugin.Cnds.OnResize);
     }
@@ -88,8 +86,10 @@
       this.Trigger(C3.Plugins.LysdenArt_MaplyLitePlugin.Cnds.OnZoomEnd);
     }
 
-    // Interação com o clique do mapa
+    // INTERACTION EVENTS
     _OnClick(e) {
+      /*       this.data.clientX = e.clientX;
+      this.data.clientY = e.clientY; */
       this.data.coords = e.coords;
       this.Trigger(C3.Plugins.LysdenArt_MaplyLitePlugin.Cnds.OnClick);
     }
@@ -112,29 +112,30 @@
     }
 
     Draw(renderer) {
-      const wi = this.GetWorldInfo();
-      const quad = wi.GetBoundingQuad();
-      const tempQuad = new C3.Quad();
+      // Only draw on canvas if dom element is placed behind it (use "Source out" blend mode)
+        const wi = this.GetWorldInfo();
+        const quad = wi.GetBoundingQuad();
+        const tempQuad = new C3.Quad();
 
-      renderer.SetBlendMode(wi.GetBlendMode());
-      renderer.SetColorFillMode();
-      renderer.SetColorRgba(
-        wi._color._r,
-        wi._color._g,
-        wi._color._b,
-        wi.GetOpacity()
-      );
+        renderer.SetBlendMode(wi.GetBlendMode());
+        renderer.SetColorFillMode();
+        renderer.SetColorRgba(
+          wi._color._r,
+          wi._color._g,
+          wi._color._b,
+          wi.GetOpacity()
+        );
 
-      if (this._runtime.IsPixelRoundingEnabled()) {
-        const ox = Math.round(wi.GetX()) - wi.GetX();
-        const oy = Math.round(wi.GetY()) - wi.GetY();
-        tempQuad.copy(quad);
-        tempQuad.offset(ox, oy);
-        renderer.Quad(tempQuad);
-      } else {
-        renderer.Quad(quad);
-      }
-      wi.SetBboxChanged();
+        if (this._runtime.IsPixelRoundingEnabled()) {
+          const ox = Math.round(wi.GetX()) - wi.GetX();
+          const oy = Math.round(wi.GetY()) - wi.GetY();
+          tempQuad.copy(quad);
+          tempQuad.offset(ox, oy);
+          renderer.Quad(tempQuad);
+        } else {
+          renderer.Quad(quad);
+        }
+        wi.SetBboxChanged();
     }
 
     Tick() {
@@ -213,12 +214,16 @@
 
     SaveToJson() {
       return {
+        // data to be saved for savegames
         params: this.params,
       };
     }
 
     LoadFromJson(o) {
+      // load state for savegames
       this.params = o["params"];
+
+      // ensures any state changes are updated in the DOM
       this.UpdateElementState();
     }
   };

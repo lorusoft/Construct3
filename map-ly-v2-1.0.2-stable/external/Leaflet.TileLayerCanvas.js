@@ -1,8 +1,6 @@
 L.TileLayer.Canvas = L.TileLayer.extend({
   _delays: {},
   _delaysForZoom: null,
-
-  // Função para criar o canvas e desenhar a imagem no tile
   createCanvas: function (tile, coords, done) {
     let err;
     const ctx = tile.getContext("2d");
@@ -22,19 +20,15 @@ L.TileLayer.Canvas = L.TileLayer.extend({
         done(err, tile);
       }
     };
-
     const tileZoom = this._getZoomForUrl();
     img.src = isNaN(tileZoom) ? '' : this.getTileUrl(coords);
     img.crossOrigin = "anonymous";
   },
-
-  // Função para criar o tile
   createTile: function (coords, done) {
     const { timeout } = this.options;
     const { z: zoom } = coords;
     const tile = document.createElement("canvas");
 
-    // Controle de delay para renderização de tiles
     if (timeout) {
       if (zoom !== this._delaysForZoom) {
         this._clearDelaysForZoom();
@@ -52,8 +46,6 @@ L.TileLayer.Canvas = L.TileLayer.extend({
 
     return tile;
   },
-
-  // Função para limpar delays específicos de zoom
   _clearDelaysForZoom: function() {
     const prevZoom = this._delaysForZoom;
     const delays = this._delays[prevZoom];
@@ -67,56 +59,8 @@ L.TileLayer.Canvas = L.TileLayer.extend({
 
     delete this._delays[prevZoom];
   },
-
-  // Função para configurar a visibilidade do controle de zoom
-  setZoomControlVisible: function(visible) {
-    const zoomControl = this._map.zoomControl;
-    if (zoomControl) {
-      if (visible === "visible") {
-        zoomControl.setPosition('topright'); // ou qualquer posição que preferir
-        zoomControl.addTo(this._map);
-      } else {
-        this._map.removeControl(zoomControl);
-      }
-    }
-  },
-
-  // Função para definir o estilo e comportamentos do tile layer
-  changeTileLayerStyle: function(url, attribution) {
-    this.setUrl(url);
-    this._url = url;
-    if (attribution) {
-      this.setAttribution(attribution);
-    }
-  }
 });
 
-// Função para inicializar a camada de tiles personalizada
 L.tileLayer.canvas = function tileLayerCanvas(url, options) {
   return new L.TileLayer.Canvas(url, options);
-};
-
-// Método adicional para adicionar e gerenciar marcadores
-L.TileLayer.Canvas.prototype.addMarker = function(lat, lng, iconUrl, title, popupContent) {
-  const marker = L.marker([lat, lng], {
-    icon: L.icon({ iconUrl: iconUrl, iconSize: [32, 32] }),
-    title: title
-  });
-
-  if (popupContent) {
-    marker.bindPopup(popupContent);
-  }
-
-  marker.addTo(this._map);
-  return marker;
-};
-
-// Função para manipulação de eventos de clique nos marcadores
-L.TileLayer.Canvas.prototype.addClickEventToMarker = function(marker, callback) {
-  marker.on('click', callback);
-};
-
-// Função para remover marcadores
-L.TileLayer.Canvas.prototype.removeMarker = function(marker) {
-  this._map.removeLayer(marker);
 };

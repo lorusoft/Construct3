@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<c2addon>
+	<!-- One of: plugin, behavior, effect -->
+	<type>plugin</type>
+	
+	<name>Open Street Maps</name>	
+	<version>2.0</version>
+	<author>Lorusoft</author>
+	<website>https://pasoft.rf.gd/</website>
+	<documentation>https://pasoft.rf.gd/</documentation>
+	<description>This plugin let's you use Open Street Maps Api.</description>
+</c2addon>
